@@ -28,7 +28,7 @@ public class UserController {
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public UserEntity byId(@PathParam("id") BigInteger id) throws UserNotFoundException {
+    public UserEntity byId(@PathVariable(name = "id") BigInteger id) throws UserNotFoundException {
         return this.usersRepository
                 .findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
@@ -47,7 +47,7 @@ public class UserController {
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public UserEntity updateAll(
-            @PathParam("id") BigInteger id,
+            @PathVariable(name = "id") BigInteger id,
             @Valid @RequestBody UserRequest incommingUser
     ) throws UserNotFoundException {
 
