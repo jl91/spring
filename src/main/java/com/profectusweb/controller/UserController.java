@@ -4,14 +4,13 @@ import com.profectusweb.exception.UserNotFoundException;
 import com.profectusweb.model.entity.UserEntity;
 import com.profectusweb.model.repository.UsersRepository;
 import com.profectusweb.request.UserRequest;
+import com.profectusweb.service.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.websocket.server.PathParam;
 import java.math.BigInteger;
-import java.util.Date;
 
 @RestController()
 @RequestMapping("/users")
@@ -20,9 +19,12 @@ public class UserController {
     @Autowired
     private UsersRepository usersRepository;
 
+    @Autowired
+    private UsersService usersService;
+
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public Iterable<UserEntity> all(@RequestParam(value = "name", defaultValue = "World") String name) {
+    public Iterable<UserEntity> all() {
         return usersRepository.findAll();
     }
 
@@ -37,11 +39,8 @@ public class UserController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public UserEntity create(@Valid @RequestBody UserRequest incommingUser) {
-        UserEntity userEntity = new UserEntity();
-        userEntity.username = incommingUser.username;
-        userEntity.password = incommingUser.password;
-        userEntity.createdAt = new Date();
-        return this.usersRepository.save(userEntity);
+        return this.usersService
+                .create(incommingUser);
     }
 
     @PutMapping("/{id}")
@@ -50,14 +49,7 @@ public class UserController {
             @PathVariable(name = "id") BigInteger id,
             @Valid @RequestBody UserRequest incommingUser
     ) throws UserNotFoundException {
-
-        UserEntity userEntity = this.usersRepository
-                .findById(id)
-                .orElseThrow(() -> new UserNotFoundException(id));
-
-        userEntity.username = incommingUser.username;
-        userEntity.password = incommingUser.password;
-        userEntity.updatedAt = new Date();
-        return this.usersRepository.save(userEntity);
+        return this.usersService
+                .update(id, incommingUser);
     }
 }
